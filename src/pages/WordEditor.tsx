@@ -3,8 +3,7 @@ import TextEditor from "../components/TextEditor";
 
 export default function WordEditor() {
   return (
-    <Container minW="3xl" centerContent>
-      Editor:
+    <Container minW="5xl" centerContent>
       <TextEditor />
     </Container>
   );

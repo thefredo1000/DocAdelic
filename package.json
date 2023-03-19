@@ -2,6 +2,11 @@
   "name": "docadelic",
   "version": "0.1.0",
   "private": true,
+  "browser": {
+    "fs": false,
+    "os": false,
+    "path": false
+  },
   "dependencies": {
     "@chakra-ui/icons": "^2.0.17",
     "@chakra-ui/react": "^2.5.1",
@@ -14,8 +19,10 @@
     "@types/node": "^16.7.13",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
+    "docx": "^8.0.0",
     "draft-js": "^0.11.7",
     "framer-motion": "^10.6.0",
+    "fs": "^0.0.1-security",
     "immutable": "^4.3.0",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.1",
