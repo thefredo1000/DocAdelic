@@ -4,6 +4,30 @@
   border: 1px solid #ccc;
   min-width: 1063px;
   min-height: 1375px;
+  font-family: Arial;
+}
+
+.editor-class h1 {
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+}
+
+.editor-class h2 {
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+}
+
+.editor-class h3 {
+  margin: 0;
+  padding: 0;
+}
+
+.editor-class h4 {
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
 }
 
 .toolbar-class {

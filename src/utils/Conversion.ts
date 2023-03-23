@@ -1,5 +1,5 @@
-import { ContentBlock, DraftBlockType, DraftInlineStyle } from "draft-js";
-import { Document, Packer, Paragraph, TextRun, UnderlineType } from "docx";
+import { ContentBlock } from "draft-js";
+import { Paragraph, TextRun } from "docx";
 
 export function handleConversion(block: ContentBlock) {
   const type = block.getType();
@@ -33,14 +33,39 @@ export function handleConversion(block: ContentBlock) {
   }
 }
 
+// Get the font size from the styles
+function getFontSize(styles: string[]) {
+  const fontSize = styles.filter((s) => s.includes("fontsize-"));
+  return fontSize.length === 0 ? 16 : parseInt(fontSize[0].split("-")[1]);
+}
+
+// Get the font family from the styles
+function getFontFamily(styles: string[]) {
+  const fontFamily = styles.filter((s) => s.includes("fontfamily-"));
+  return fontFamily.length === 0 ? "Arial" : fontFamily[0].split("-")[1];
+}
+
+// Create a text run from the text and styles
+function createTextRun(text: string, styles: string[]) {
+  return new TextRun({
+    text,
+    bold: styles.includes("BOLD"),
+    italics: styles.includes("ITALIC"),
+    underline: styles.includes("UNDERLINE") ? {} : undefined,
+    size: getFontSize(styles) * 2,
+    font: getFontFamily(styles),
+  });
+}
+
 function convertParagraph(block: ContentBlock) {
+  // Get the text and character list from the block
   const text = block.getText();
   const charList = block.getCharacterList();
   const charArray = charList.toJS();
 
+  // Keep track of the last text run
   let lastText: string = "";
   let lastStyles: string[] = [];
-
   let textRuns: TextRun[] = [];
 
   // Iterate through the text and character list
@@ -54,73 +79,20 @@ function convertParagraph(block: ContentBlock) {
     }
     // If the styles are different, create a new text run
     else {
-      const run = new TextRun({
-        text: lastText,
-        bold: lastStyles.includes("BOLD"),
-        italics: lastStyles.includes("ITALIC"),
-        underline: lastStyles.includes("UNDERLINE") ? {} : undefined,
-      });
-      textRuns.push(run);
+      getFontSize(lastStyles);
+      textRuns.push(createTextRun(lastText, lastStyles));
       lastText = char;
       lastStyles = charStyles;
     }
   }
 
   // Add the last text run
-  const run = new TextRun({
-    text: lastText,
-    bold: lastStyles.includes("BOLD"),
-    italics: lastStyles.includes("ITALIC"),
-    underline: lastStyles.includes("UNDERLINE") ? {} : undefined,
-  });
-  textRuns.push(run);
+  getFontSize(lastStyles);
+  textRuns.push(createTextRun(lastText, lastStyles));
 
+  // Create the paragraph
   const paragraph = new Paragraph({
     children: textRuns,
   });
   return paragraph;
-}
-
-function convertHeaderOne(block: ContentBlock) {
-  throw new Error("Function not implemented.");
-}
-
-function convertHeaderTwo(block: ContentBlock) {
-  throw new Error("Function not implemented.");
-}
-
-function convertHeaderThree(block: ContentBlock) {
-  throw new Error("Function not implemented.");
-}
-
-function convertHeaderFour(block: ContentBlock) {
-  throw new Error("Function not implemented.");
-}
-
-function convertHeaderFive(block: ContentBlock) {
-  throw new Error("Function not implemented.");
-}
-
-function convertHeaderSix(block: ContentBlock) {
-  throw new Error("Function not implemented.");
-}
-
-function convertBlockquote(block: ContentBlock) {
-  throw new Error("Function not implemented.");
-}
-
-function convertCodeBlock(block: ContentBlock) {
-  throw new Error("Function not implemented.");
-}
-
-function convertAtomic(block: ContentBlock) {
-  throw new Error("Function not implemented.");
-}
-
-function convertOrderedList(block: ContentBlock) {
-  throw new Error("Function not implemented.");
-}
-
-function convertUnorderedList(block: ContentBlock) {
-  throw new Error("Function not implemented.");
 }

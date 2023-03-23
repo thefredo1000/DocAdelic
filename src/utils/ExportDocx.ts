@@ -1,4 +1,4 @@
-import { Document, Packer, Paragraph } from "docx";
+import { Document, Packer } from "docx";
 import { FileChild } from "docx/build/file/file-child";
 import { ContentBlock } from "draft-js";
 import { handleConversion } from "./Conversion";
