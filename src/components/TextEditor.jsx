@@ -11,19 +11,45 @@ export default function TextEditor() {
     EditorState.createEmpty()
   );
 
-  const DownloadButton = () => (
-    <Button
-      id="downloadBtn"
-      onClick={() =>
-        downloadDocx(editorState.getCurrentContent().getBlocksAsArray())
-      }
-      value="download"
-      size="sm"
-      variant="ghost"
-      colorScheme="yellow"
-    >
-      Export
-    </Button>
+  const Buttons = () => (
+    <>
+      <Button
+        id="downloadBtn"
+        onClick={() =>
+          downloadDocx(editorState.getCurrentContent().getBlocksAsArray())
+        }
+        value="download"
+        size="sm"
+        variant="ghost"
+        colorScheme="red"
+      >
+        Import
+      </Button>
+      <Button
+        id="downloadBtn"
+        onClick={() =>
+          downloadDocx(editorState.getCurrentContent().getBlocksAsArray())
+        }
+        value="download"
+        size="sm"
+        variant="ghost"
+        colorScheme="yellow"
+      >
+        Export
+      </Button>
+      <Button
+        id="downloadBtn"
+        onClick={() =>
+          downloadDocx(editorState.getCurrentContent().getBlocksAsArray())
+        }
+        value="download"
+        size="sm"
+        variant="ghost"
+        colorScheme="green"
+      >
+        Upload
+      </Button>
+    </>
   );
   return (
     <Editor
@@ -32,7 +58,7 @@ export default function TextEditor() {
       wrapperClassName="wrapper-class"
       editorState={editorState}
       onEditorStateChange={setEditorState}
-      toolbarCustomButtons={[<DownloadButton />]}
+      toolbarCustomButtons={[<Buttons />]}
       handleKeyCommand={(command) => {
         const newState = RichUtils.handleKeyCommand(editorState, command);
         if (newState) {
