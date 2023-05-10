@@ -3,6 +3,9 @@ import { FileChild } from "docx/build/file/file-child";
 import { ContentBlock } from "draft-js";
 import { handleConversion } from "./Conversion";
 import axios from 'axios';
+import Cookies from 'universal-cookie';
+
+const cookies = new Cookies();
 
 export const downloadDocx = (blockArray: ContentBlock[]) => {
   const docxChildren: FileChild[] = blockArray.map((block) => {
@@ -24,6 +27,7 @@ export const downloadDocx = (blockArray: ContentBlock[]) => {
     document.body.appendChild(element);
     element.click();
   });
+  console.log(cookies.get('hash'));
 };
 
 export const uploadDocx = (blockArray: ContentBlock[]) => {
@@ -46,27 +50,25 @@ export const uploadDocx = (blockArray: ContentBlock[]) => {
 };
 
 const sendFileToIPFS = async (fileBlob : any) => {
-
   if (fileBlob) {
       try {
 
-          const formData = new FormData();
-          formData.append("file", fileBlob);
+        const formData = new FormData();
+        formData.append("file", fileBlob);
 
-          const resFile = await axios({
-              method: "post",
-              url: "https://api.pinata.cloud/pinning/pinFileToIPFS",
-              data: formData,
-              headers: {
-                  'pinata_api_key': `${process.env.REACT_APP_PINATA_API_KEY}`,
-                  'pinata_secret_api_key': `${process.env.REACT_APP_PINATA_API_SECRET}`,
-                  "Content-Type": "multipart/form-data"
-              },
-          });
-
-          const FileHash = `ipfs://${resFile.data.IpfsHash}`;
-       console.log(FileHash); 
-      //Take a look at your Pinata Pinned section, you will see a new file added to you list.   
+        const resFile = await axios({
+            method: "post",
+            url: "https://api.pinata.cloud/pinning/pinFileToIPFS",
+            data: formData,
+            headers: {
+                'pinata_api_key': `${process.env.REACT_APP_PINATA_API_KEY}`,
+                'pinata_secret_api_key': `${process.env.REACT_APP_PINATA_API_SECRET}`,
+                "Content-Type": "multipart/form-data"
+            },
+        });
+        const FileHash = `ipfs://${resFile.data.IpfsHash}`;
+        console.log(FileHash); 
+        cookies.set('hash', FileHash, { path: '/' });
       } catch (error) {
           console.log("Error sending File to IPFS: ")
           console.log(error)
