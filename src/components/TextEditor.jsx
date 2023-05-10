@@ -3,7 +3,7 @@ import { EditorState, RichUtils } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
 import "../../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { Button } from "@chakra-ui/react";
-import { downloadDocx } from "../utils/ExportDocx";
+import { downloadDocx, uploadDocx } from "../utils/ExportDocx";
 import "./styles/TextEditor.css";
 
 export default function TextEditor() {
@@ -35,12 +35,12 @@ export default function TextEditor() {
         variant="ghost"
         colorScheme="yellow"
       >
-        Export
+        Download
       </Button>
       <Button
         id="downloadBtn"
         onClick={() =>
-          downloadDocx(editorState.getCurrentContent().getBlocksAsArray())
+          uploadDocx(editorState.getCurrentContent().getBlocksAsArray())
         }
         value="download"
         size="sm"
