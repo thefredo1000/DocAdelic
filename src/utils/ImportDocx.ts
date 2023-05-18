@@ -3,7 +3,7 @@ import { FileChild } from "docx/build/file/file-child";
 import { ContentBlock } from "draft-js";
 import { handleConversion } from "./Conversion";
 
-export const downloadDocx = (blockArray: ContentBlock[]) => {
+async function downloadDocxTemp(blockArray: ContentBlock[]) {
   const docxChildren: FileChild[] = blockArray.map((block) => {
     return handleConversion(block);
   });
@@ -17,10 +17,8 @@ export const downloadDocx = (blockArray: ContentBlock[]) => {
   });
 
   const element = document.createElement("a");
-  Packer.toBlob(doc).then((blob) => {
-    element.href = URL.createObjectURL(blob);
-    element.download = "doc-" + Date.now() + ".docx";
-    document.body.appendChild(element);
-    element.click();
-  });
+  return await Packer.toBlob(doc);
+}
+export const importDocx = (document: Document) => {
+  console.log("importDocx", document);
 };
