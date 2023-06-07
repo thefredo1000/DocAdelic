@@ -44,6 +44,8 @@ import {
 import DropDown, { DropDownItem } from "./Dropdown";
 
 import { Button } from "@chakra-ui/react";
+import { downloadDocxLexical } from "../../utils/ExportDocx";
+import { cssToJson } from "../../utils/ConversionLexical";
 
 const LowPriority = 1;
 
@@ -450,7 +452,6 @@ function BlockOptionsDropdownList({
 function FontDropDown({ editor, value, style, disabled = false }) {
   const handleClick = useCallback(
     (option) => {
-      console.log(editor);
       editor.update(() => {
         const selection = $getSelection();
         if ($isRangeSelection(selection)) {
@@ -467,7 +468,6 @@ function FontDropDown({ editor, value, style, disabled = false }) {
     style === "font-family"
       ? "Formatting options for font family"
       : "Formatting options for font size";
-
   return (
     <DropDown
       disabled={disabled}
@@ -514,7 +514,7 @@ export default function ToolbarPlugin() {
   const [isCode, setIsCode] = useState(false);
   const [isEditable, setIsEditable] = useState(() => editor.isEditable());
   const [fontFamily, setFontFamily] = useState("Arial");
-  const [fontSize, setFontSize] = useState('15px');
+  const [fontSize, setFontSize] = useState("15px");
   const updateToolbar = useCallback(() => {
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
@@ -542,6 +542,9 @@ export default function ToolbarPlugin() {
         }
       }
       // Update text format
+      console.log(selection);
+      setFontSize(cssToJson(selection.style)["font-size"] || "15px");
+      setFontFamily(cssToJson(selection.style)["font-family"] || "Arial");
       setIsBold(selection.hasFormat("bold"));
       setIsItalic(selection.hasFormat("italic"));
       setIsUnderline(selection.hasFormat("underline"));
@@ -618,11 +621,9 @@ export default function ToolbarPlugin() {
   }, [editor, isLink]);
 
   const downloadDocx = () => {
-    console.log("coo");
     editor.update(() => {
       const root = $getRoot();
-      console.log(root);
-      console.log(root.getAllTextNodes());
+      downloadDocxLexical(root);
     });
   };
 

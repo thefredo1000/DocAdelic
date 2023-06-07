@@ -20,12 +20,11 @@ import DefaultTheme from "./themes/DefaultTheme.js";
 
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 
-import "./styles/LexicalEditor.css"
+import "./styles/LexicalEditor.css";
 function Placeholder() {
   return <div className="editor-placeholder"></div>;
 }
-const a : EditorThemeClasses = {
-}
+const a: EditorThemeClasses = {};
 const editorConfig: any = {
   // The theme is optional, but you can customize the look and feel of the
   // editor by passing in a theme object.
@@ -56,11 +55,9 @@ export default function Editor() {
       const root = $getRoot();
       const selection = $getSelection();
 
-      console.log(root);
-      console.log(root.getAllTextNodes());
     });
   }
-  
+
   return (
     <LexicalComposer initialConfig={editorConfig}>
       <div className="editor-container">
