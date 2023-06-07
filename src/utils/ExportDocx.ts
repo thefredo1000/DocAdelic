@@ -6,12 +6,14 @@ import axios from 'axios';
 import Cookies from 'universal-cookie';
 
 const cookies = new Cookies();
+import { RootNode } from "lexical";
+import { handleConversionLex } from "./ConversionLexical";
 
-export const downloadDocx = (blockArray: ContentBlock[]) => {
-  const docxChildren: FileChild[] = blockArray.map((block) => {
-    return handleConversion(block);
-  });
 
+export const uploadDocx = (root: RootNode) => {
+  const docxChildren: FileChild[] = root.getChildren().map((child) => 
+    handleConversionLex(child)
+  );
   const doc = new Document({
     sections: [
       {
@@ -30,11 +32,10 @@ export const downloadDocx = (blockArray: ContentBlock[]) => {
   console.log(cookies.get('hash'));
 };
 
-export const uploadDocx = (blockArray: ContentBlock[]) => {
-  const docxChildren: FileChild[] = blockArray.map((block) => {
-    return handleConversion(block);
-  });
-
+export const downloadDocx = (root: RootNode) => {
+  const docxChildren: FileChild[] = root.getChildren().map((child) => 
+    handleConversionLex(child)
+  );
   const doc = new Document({
     sections: [
       {
