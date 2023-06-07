@@ -1,4 +1,3 @@
-import { ContentBlock } from "draft-js";
 import { Paragraph, TextRun } from "docx";
 import { LexicalNode, ParagraphNode, TextNode } from "lexical";
 
@@ -60,17 +59,6 @@ function convertParagraph(paragraphNode: ParagraphNode) {
     children: textRuns,
   });
   return paragraph;
-}
-// Get the font size from the styles
-function getFontSize(styles: string[]) {
-  const fontSize = styles.filter((s) => s.includes("fontsize-"));
-  return fontSize.length === 0 ? 16 : parseInt(fontSize[0].split("-")[1]);
-}
-
-// Get the font family from the styles
-function getFontFamily(styles: string[]) {
-  const fontFamily = styles.filter((s) => s.includes("fontfamily-"));
-  return fontFamily.length === 0 ? "Arial" : fontFamily[0].split("-")[1];
 }
 
 // Create a text run from the text and styles
