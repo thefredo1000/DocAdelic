@@ -21,6 +21,11 @@ import DefaultTheme from "./themes/DefaultTheme.js";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 
 import "./styles/LexicalEditor.css";
+import { BrowserProvider } from "ethers";
+import { useLocation } from "react-router-dom";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { importFileTest } from "../utils/LexicalFiles";
+import { useEffect } from "react";
 function Placeholder() {
   return <div className="editor-placeholder"></div>;
 }
@@ -48,20 +53,30 @@ const editorConfig: any = {
 // When the editor changes, you can get notified via the
 // LexicalOnChangePlugin!
 
-export default function Editor() {
+export default function Editor(props: {
+  walletAddress: string | undefined;
+  provider: BrowserProvider;
+}) {
+  const location = useLocation();
+  console.log(location.state);
+  const loadedFile = location.state ? location.state : undefined;
+
+  const { walletAddress, provider } = props;
   function onChange(editorState: any) {
     editorState.read(() => {
       // Read the contents of the EditorState here.
       const root = $getRoot();
       const selection = $getSelection();
-
     });
   }
-
   return (
     <LexicalComposer initialConfig={editorConfig}>
       <div className="editor-container">
-        <ToolbarPlugin />
+        <ToolbarPlugin
+          walletAddress={walletAddress}
+          provider={provider}
+          loadedFile={loadedFile}
+        />
         <div className="editor-inner">
           <RichTextPlugin
             contentEditable={<ContentEditable className="editor-input" />}

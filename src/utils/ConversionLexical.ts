@@ -5,9 +5,7 @@ interface Styles {
   [key: string]: string;
 }
 
-export function handleConversionLex(lexNode: LexicalNode): Paragraph {
-  console.log(lexNode.getType());
-
+export function handleConversion(lexNode: LexicalNode): Paragraph {
   if (lexNode.getType() === "paragraph") {
     return convertParagraph(lexNode as ParagraphNode);
   }
@@ -53,7 +51,6 @@ function convertParagraph(paragraphNode: ParagraphNode) {
   const textRuns: TextRun[] = paragraphNode
     .getChildren()
     .map((child) => createTextRun(child as TextNode));
-  console.log(textRuns);
 
   const paragraph = new Paragraph({
     children: textRuns,
@@ -64,14 +61,14 @@ function convertParagraph(paragraphNode: ParagraphNode) {
 // Create a text run from the text and styles
 function createTextRun(textNode: TextNode) {
   const styles = cssToJson(textNode.getStyle());
-  console.log(styles);
   return new TextRun({
     text: textNode.getTextContent(),
     bold: textNode.hasFormat("bold"),
     italics: textNode.hasFormat("italic"),
     underline: textNode.hasFormat("underline") ? {} : undefined,
-
-    size: styles["font-size"] ? parseInt(styles["font-size"]) * 2 : 30,
+    size: styles["font-size"]
+      ? parseInt(styles["font-size"]) * (3 / 4)
+      : (15 * 3) / 4,
     font: styles["font-family"] ? styles["font-family"] : "Arial",
   });
 }

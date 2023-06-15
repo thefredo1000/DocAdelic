@@ -1,11 +1,11 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
 import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
 import WordEditor from "./pages/WordEditor";
 import Root from "./components/Root";
 import { render } from "react-dom";  
+import Home from "./pages/Home";
 
 const router = createBrowserRouter([
   {
@@ -15,6 +15,10 @@ const router = createBrowserRouter([
       {
         path: "/editor",
         element: <WordEditor />,
+      },
+      {
+        path: "/",
+        element: <Home />,
       },
     ],
   },

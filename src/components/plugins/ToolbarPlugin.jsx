@@ -1,7 +1,10 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  lexical,
   $getRoot,
+  $insertNodes,
+  $generateNodesFromDOM,
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
   REDO_COMMAND,
@@ -44,8 +47,27 @@ import {
 import DropDown, { DropDownItem } from "./Dropdown";
 
 import { Button } from "@chakra-ui/react";
-import { downloadDocxLexical } from "../../utils/ExportDocx";
+import { downloadDocx } from "../../utils/ExportDocx";
 import { cssToJson } from "../../utils/ConversionLexical";
+import {
+  exportFile,
+  importFile,
+  importFileTest,
+} from "../../utils/LexicalFiles";
+
+import Cookies from "universal-cookie";
+
+import { ethers, Contract } from "ethers";
+import {
+  docadelicSmartContractAddress,
+  docadelicSmartContractAbi,
+  createNewFile,
+  displayUserFiles,
+} from "../../utils/SmartContractFunctions";
+
+import UploadButton from "../UploadButton";
+
+const cookies = new Cookies();
 
 const LowPriority = 1;
 
@@ -70,6 +92,11 @@ const FONT_SIZE_OPTIONS = [
   ["18px", "18px"],
   ["19px", "19px"],
   ["20px", "20px"],
+  ["25px", "25px"],
+  ["30px", "30px"],
+  ["35px", "35px"],
+  ["40px", "40px"],
+  ["45px", "45px"],
 ];
 const supportedBlockTypes = new Set([
   "paragraph",
@@ -495,7 +522,7 @@ function FontDropDown({ editor, value, style, disabled = false }) {
   );
 }
 
-export default function ToolbarPlugin() {
+export default function ToolbarPlugin({ walletAddress, provider, loadedFile }) {
   const [editor] = useLexicalComposerContext();
   const toolbarRef = useRef(null);
   const [canUndo, setCanUndo] = useState(false);
@@ -542,7 +569,6 @@ export default function ToolbarPlugin() {
         }
       }
       // Update text format
-      console.log(selection);
       setFontSize(cssToJson(selection.style)["font-size"] || "15px");
       setFontFamily(cssToJson(selection.style)["font-family"] || "Arial");
       setIsBold(selection.hasFormat("bold"));
@@ -597,6 +623,18 @@ export default function ToolbarPlugin() {
     );
   }, [editor, updateToolbar]);
 
+  useEffect(() => {
+    const setRichText = () => {
+      editor.update(async () => {
+        const root = $getRoot();
+
+        $getRoot().select();
+        importFileTest(editor, loadedFile);
+      });
+    };
+    setRichText();
+  }, [editor, loadedFile]);
+
   const codeLanguges = useMemo(() => getCodeLanguages(), []);
   const onCodeLanguageSelect = useCallback(
     (e) => {
@@ -620,10 +658,37 @@ export default function ToolbarPlugin() {
     }
   }, [editor, isLink]);
 
-  const downloadDocx = () => {
+  const handleDownloadClick = () => {
     editor.update(() => {
       const root = $getRoot();
-      downloadDocxLexical(root);
+      downloadDocx(root);
+    });
+  };
+
+  const [prevRoot, setPrevRoot] = useState(null);
+
+  const iface = new ethers.Interface(docadelicSmartContractAbi);
+
+  const uploadToIPFS = async () => {
+    const docadelicSmartContractInstance = new Contract(
+      docadelicSmartContractAddress,
+      iface,
+      await provider.getSigner()
+    );
+
+    exportFile(editor, { fileName: Date.now().toString(), source: "" }).then(
+      async (data) => {
+        const a = await docadelicSmartContractInstance.createNewFile(data);
+      }
+    );
+  };
+
+  const setRichText = () => {
+    editor.update(async () => {
+      const root = $getRoot();
+
+      $getRoot().select();
+      importFileTest(editor, loadedFile);
     });
   };
 
@@ -650,32 +715,6 @@ export default function ToolbarPlugin() {
         <i className="format redo" />
       </button>
       <Divider />
-      {supportedBlockTypes.has(blockType) && (
-        <>
-          <button
-            className="toolbar-item block-controls"
-            onClick={() =>
-              setShowBlockOptionsDropDown(!showBlockOptionsDropDown)
-            }
-            aria-label="Formatting Options"
-          >
-            <span className={"icon block-type " + blockType} />
-            <span className="text">{blockTypeToBlockName[blockType]}</span>
-            <i className="chevron-down" />
-          </button>
-          {showBlockOptionsDropDown &&
-            createPortal(
-              <BlockOptionsDropdownList
-                editor={editor}
-                blockType={blockType}
-                toolbarRef={toolbarRef}
-                setShowBlockOptionsDropDown={setShowBlockOptionsDropDown}
-              />,
-              document.body
-            )}
-          <Divider />
-        </>
-      )}
       {blockType === "code" ? (
         <>
           <Select
@@ -727,76 +766,13 @@ export default function ToolbarPlugin() {
           >
             <i className="format underline" />
           </button>
-          <button
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough");
-            }}
-            className={
-              "toolbar-item spaced " + (isStrikethrough ? "active" : "")
-            }
-            aria-label="Format Strikethrough"
-          >
-            <i className="format strikethrough" />
-          </button>
-          <button
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "code");
-            }}
-            className={"toolbar-item spaced " + (isCode ? "active" : "")}
-            aria-label="Insert Code"
-          >
-            <i className="format code" />
-          </button>
-          <button
-            onClick={insertLink}
-            className={"toolbar-item spaced " + (isLink ? "active" : "")}
-            aria-label="Insert Link"
-          >
-            <i className="format link" />
-          </button>
           {isLink &&
             createPortal(<FloatingLinkEditor editor={editor} />, document.body)}
-          <Divider />
-          <button
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left");
-            }}
-            className="toolbar-item spaced"
-            aria-label="Left Align"
-          >
-            <i className="format left-align" />
-          </button>
-          <button
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center");
-            }}
-            className="toolbar-item spaced"
-            aria-label="Center Align"
-          >
-            <i className="format center-align" />
-          </button>
-          <button
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right");
-            }}
-            className="toolbar-item spaced"
-            aria-label="Right Align"
-          >
-            <i className="format right-align" />
-          </button>
-          <button
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "justify");
-            }}
-            className="toolbar-item"
-            aria-label="Justify Align"
-          >
-            <i className="format justify-align" />
-          </button>{" "}
+
           <Divider />
           <Button
             id="downloadBtn"
-            onClick={() => downloadDocx()}
+            onClick={() => handleDownloadClick()}
             value="download"
             size="md"
             variant="ghost"
@@ -804,6 +780,10 @@ export default function ToolbarPlugin() {
           >
             Download
           </Button>
+
+          <UploadButton
+            provider={provider}
+          />
         </>
       )}
     </div>
