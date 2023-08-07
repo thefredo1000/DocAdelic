@@ -61,14 +61,15 @@ function convertParagraph(paragraphNode: ParagraphNode) {
 // Create a text run from the text and styles
 function createTextRun(textNode: TextNode) {
   const styles = cssToJson(textNode.getStyle());
+  console.log(parseInt(styles["font-size"]));
   return new TextRun({
     text: textNode.getTextContent(),
     bold: textNode.hasFormat("bold"),
     italics: textNode.hasFormat("italic"),
     underline: textNode.hasFormat("underline") ? {} : undefined,
     size: styles["font-size"]
-      ? parseInt(styles["font-size"]) * (3 / 4)
-      : (15 * 3) / 4,
+      ? `${parseInt(styles["font-size"]) * (3 / 4)}pt`
+      : `${(15 * 3) / 4}pt`,
     font: styles["font-family"] ? styles["font-family"] : "Arial",
   });
 }
