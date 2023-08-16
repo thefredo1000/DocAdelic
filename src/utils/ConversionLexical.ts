@@ -61,7 +61,6 @@ function convertParagraph(paragraphNode: ParagraphNode) {
 // Create a text run from the text and styles
 function createTextRun(textNode: TextNode) {
   const styles = cssToJson(textNode.getStyle());
-  console.log(parseInt(styles["font-size"]));
   return new TextRun({
     text: textNode.getTextContent(),
     bold: textNode.hasFormat("bold"),

@@ -1,24 +1,19 @@
 import React, { useEffect } from "react";
 import { Container } from "@chakra-ui/react";
 import FileTable from "../components/FileTable";
-import { useOutletContext } from "react-router-dom";
-import TextEditor from "../components/TextEditor";
 import {
   docadelicSmartContractAbi,
   docadelicSmartContractAddress,
 } from "../utils/SmartContractFunctions";
-import { BigNumberish, Contract, ethers } from "ethers";
+import { Contract, ethers } from "ethers";
 import { useEthereum } from "../components/Root";
-import axios from "axios";
 
 export default function Home() {
   const { walletAddress, provider } = useEthereum();
-  const [contract, setContract] = React.useState<Contract | null>(null);
-  const [files, setFiles] = React.useState<any[]>([]);
   const [fileData, setFileData] = React.useState<any[]>([]);
 
   function getFileData(fileHashes: string[]) {
-    const a = fileHashes.forEach((fileHash) => {
+    fileHashes.forEach((fileHash) => {
       fetch(`https://ipfs.io/ipfs/${fileHash}`)
         .then((res) => res.json())
         .then((data) => {
@@ -53,7 +48,6 @@ export default function Home() {
       }
 
       console.log(files);
-      setFiles(files);
       getFileData(files);
     }
     getFiles();

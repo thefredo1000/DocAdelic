@@ -16,7 +16,6 @@ import {
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { Interface, Contract } from "ethers";
 import { BrowserProvider } from "ethers/lib.commonjs/providers";
-import { LexicalEditor } from "lexical";
 import { useState } from "react";
 import { exportFile } from "../utils/LexicalFiles";
 import {
@@ -55,8 +54,8 @@ export default function UploadButton(props: { provider: BrowserProvider }) {
       source: "",
     });
     if (!data) {
-        setStatus(uploadStatus.ERROR);
-        return;
+      setStatus(uploadStatus.ERROR);
+      return;
     }
 
     await docadelicSmartContractInstance
